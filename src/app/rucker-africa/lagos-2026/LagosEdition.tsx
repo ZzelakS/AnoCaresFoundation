@@ -302,7 +302,7 @@ export default function LagosEdition() {
           </div>
           <div className="reveal chapter-split-media">
             <Figure
-              src={images.ruckerpark.boss}
+              src={images.ruckerpark.education}
               alt="Students receiving iPads and educational resources at Rucker Park Africa Lagos 2026"
               caption="25 iPads and educational resources were distributed to young participants."
             />
@@ -380,7 +380,7 @@ export default function LagosEdition() {
       </Chapter>
 
       {/* ── 07 ── */}
-      <Chapter id="ch-07" num="07" label="Dunk Contest">
+            <Chapter id="ch-07" num="07" label="Dunk Contest">
         <div className="chapter-split media-wide">
           <div>
             <Eyebrow>FruitGuard Dunk Contest</Eyebrow>
@@ -415,6 +415,12 @@ export default function LagosEdition() {
           </div>
         )}
       </Chapter>
+
+      <MediaBreak
+        src={images.ruckerpark.juice}
+        alt="FruitGuard rehydration products supplied to athletes at Rucker Park Africa Lagos 2026"
+        caption="FruitGuard supplied rehydration products to approximately 100 participating athletes."
+      />
 
       {/* ── 08 ── */}
       <Chapter id="ch-08" num="08" label="Three-Point" alt>

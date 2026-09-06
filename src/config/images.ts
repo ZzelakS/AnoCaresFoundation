@@ -68,6 +68,8 @@ export const images = {
     bona: '/images/ruckerpark/bona.jpg',       // Adem Bona at the event
     legacy2: '/images/ruckerpark/legacyy.jpg',
     team: '/images/ruckerpark/team.jpg',
+    juice: '/images/ruckerpark/juice.jpg',
+    education: '/images/ruckerpark/education.jpg',
   },
 }
 
