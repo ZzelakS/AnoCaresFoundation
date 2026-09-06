@@ -69,6 +69,42 @@ const Stats = ({ items, light = false }: { items: { n: string; l: string }[]; li
   </div>
 )
 
+/* Image that keeps its natural ratio — nothing cropped, any orientation */
+const Figure = ({ src, alt, caption }: { src: string; alt: string; caption?: string }) => (
+  <figure style={{ margin: 0 }}>
+    <div style={{ position: 'relative' }}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{ width: '100%', height: 'auto', display: 'block', backgroundColor: '#1a1a1a' }}
+      />
+      <div className="corner-accent" />
+    </div>
+    {caption && (
+      <figcaption style={{ fontSize: '0.72rem', color: 'var(--text-faint)', lineHeight: 1.7, marginTop: '1rem', fontStyle: 'italic' }}>
+        {caption}
+      </figcaption>
+    )}
+  </figure>
+)
+
+/* Centred image band for chapters without a side column */
+const BandImage = ({ src, alt, caption }: { src: string; alt: string; caption?: string }) => (
+  <figure className="reveal band-image">
+    <div style={{ position: 'relative' }}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{ width: '100%', height: 'auto', display: 'block', backgroundColor: '#1a1a1a' }}
+      />
+      <div className="corner-accent" />
+    </div>
+    {caption && <figcaption>{caption}</figcaption>}
+  </figure>
+)
+
 const Chapter = ({
   id, num, label, dark = false, alt = false, children,
 }: {
@@ -139,32 +175,41 @@ export default function LagosEdition() {
 
       {/* ── 01 ── */}
       <Chapter id="ch-01" num="01" label="Origin">
-        <div className="chapter-narrow">
-          <Eyebrow>Lagos, Nigeria — July 30, 2026</Eyebrow>
-          <H>From Harlem To Lagos</H>
-          <P>
-            Rucker Park Africa officially launched at Rowe Park in Lagos, marking the beginning of a new
-            chapter connecting the cultural legacy of New York street basketball with youth development
-            and opportunity across Africa.
-          </P>
-          <P delay={3}>
-            Led by Nigerian-American professional basketball player E.J. Anosike, President of Rucker Park
-            Africa and Chairman of the Anosike Cares Foundation, the inaugural activation brought together
-            basketball, music, creators, education, youth employment, local businesses and community
-            programming in one environment.
-          </P>
-          <P delay={4}>
-            Nigeria was chosen as the starting point on purpose. The goal was never simply to stage an
-            international basketball event in Lagos — it was to use the reach of sport and culture to build
-            something that directly benefited young people as athletes, students, employees, creators and
-            future professionals.
-          </P>
-          <Quote>
-            Charity begins at home. Basketball and education have given me the opportunity to travel the
-            world and build relationships across different countries and industries. For me, the
-            responsibility is finding ways to bring some of that access back home and create opportunities
-            for young people who may not have had them before.
-          </Quote>
+        <div className="chapter-split media-wide">
+          <div>
+            <Eyebrow>Lagos, Nigeria — July 30, 2026</Eyebrow>
+            <H>From Harlem To Lagos</H>
+            <P>
+              Rucker Park Africa officially launched at Rowe Park in Lagos, marking the beginning of a new
+              chapter connecting the cultural legacy of New York street basketball with youth development
+              and opportunity across Africa.
+            </P>
+            <P delay={3}>
+              Led by Nigerian-American professional basketball player E.J. Anosike, President of Rucker Park
+              Africa and Chairman of the Anosike Cares Foundation, the inaugural activation brought together
+              basketball, music, creators, education, youth employment, local businesses and community
+              programming in one environment.
+            </P>
+            <P delay={4}>
+              Nigeria was chosen as the starting point on purpose. The goal was never simply to stage an
+              international basketball event in Lagos — it was to use the reach of sport and culture to build
+              something that directly benefited young people as athletes, students, employees, creators and
+              future professionals.
+            </P>
+            <Quote>
+              Charity begins at home. Basketball and education have given me the opportunity to travel the
+              world and build relationships across different countries and industries. For me, the
+              responsibility is finding ways to bring some of that access back home and create opportunities
+              for young people who may not have had them before.
+            </Quote>
+          </div>
+          <div className="reveal chapter-split-media">
+            <Figure
+              src={images.ruckerpark.main}
+              alt="E.J. Anosike at Rowe Park, Lagos during the inaugural Rucker Park Africa activation"
+              caption="E.J. Anosike at Rowe Park, Lagos — 30 July 2026."
+            />
+          </div>
         </div>
       </Chapter>
 
@@ -172,7 +217,7 @@ export default function LagosEdition() {
 
       {/* ── 02 ── */}
       <Chapter id="ch-02" num="02" label="Impact" dark>
-        <div className="chapter-narrow" style={{ textAlign: 'center' }}>
+        <div className="chapter-narrow" style={{ textAlign: 'center', margin: '0 auto' }}>
           <Eyebrow>The Numbers</Eyebrow>
           <H light>The Impact In Numbers</H>
           <P light delay={2}>
@@ -180,6 +225,7 @@ export default function LagosEdition() {
             education, sport and community participation.
           </P>
         </div>
+
         <Stats items={impactStats} light />
         {videos.crowd && (
           <div className="chapter-narrow" style={{ marginTop: '3rem' }}>
@@ -190,7 +236,7 @@ export default function LagosEdition() {
 
       {/* ── 03 ── */}
       <Chapter id="ch-03" num="03" label="Employment">
-        <div className="chapter-split">
+        <div className="chapter-split media-wide">
           <div>
             <Eyebrow>Opportunity Beyond The Court</Eyebrow>
             <H>150 Young Nigerians Went To Work</H>
@@ -217,9 +263,10 @@ export default function LagosEdition() {
             </Quote>
           </div>
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.impact), aspectRatio: '4/5', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.impact}
+              alt="Young Nigerians working across media, production and event operations at Rucker Park Africa Lagos 2026"
+            />
           </div>
         </div>
         {videos.production && (
@@ -231,36 +278,46 @@ export default function LagosEdition() {
 
       {/* ── 04 ── */}
       <Chapter id="ch-04" num="04" label="Education" alt>
-        <div className="chapter-narrow">
-          <Eyebrow>Education As A Core Pillar</Eyebrow>
-          <H>The International University Pathway Program</H>
-          <P>
-            Education has always been central to the work of the Anosike Cares Foundation. During the
-            inaugural activation, the Foundation announced the Anosike Cares Foundation International
-            University Pathway Program.
-          </P>
-          <P delay={3}>
-            The program is being developed to help connect qualified students with undergraduate and
-            graduate educational opportunities through international universities and institutional
-            relationships. Students also received technology and educational resources during the event,
-            including 25 iPads distributed among young participants.
-          </P>
-          <P delay={4}>
-            The larger vision is not simply to help students study abroad. The goal is to help young people
-            gain education, networks, confidence and professional exposure that can expand what they are
-            able to accomplish throughout their lives. Education and sport are not separate missions — they
-            are two pathways toward the same goal.
-          </P>
+        <div className="chapter-split media-wide">
+          <div>
+            <Eyebrow>Education As A Core Pillar</Eyebrow>
+            <H>The International University Pathway Program</H>
+            <P>
+              Education has always been central to the work of the Anosike Cares Foundation. During the
+              inaugural activation, the Foundation announced the Anosike Cares Foundation International
+              University Pathway Program.
+            </P>
+            <P delay={3}>
+              The program is being developed to help connect qualified students with undergraduate and
+              graduate educational opportunities through international universities and institutional
+              relationships. Students also received technology and educational resources during the event,
+              including 25 iPads distributed among young participants.
+            </P>
+            <P delay={4}>
+              The larger vision is not simply to help students study abroad. The goal is to help young people
+              gain education, networks, confidence and professional exposure that can expand what they are
+              able to accomplish throughout their lives. Education and sport are not separate missions — they
+              are two pathways toward the same goal.
+            </P>
+          </div>
+          <div className="reveal chapter-split-media">
+            <Figure
+              src={images.ruckerpark.boss}
+              alt="Students receiving iPads and educational resources at Rucker Park Africa Lagos 2026"
+              caption="25 iPads and educational resources were distributed to young participants."
+            />
+          </div>
         </div>
       </Chapter>
 
       {/* ── 05 ── */}
       <Chapter id="ch-05" num="05" label="Girls & Young Women">
-        <div className="chapter-split">
+        <div className="chapter-split media-wide media-left">
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.hope), aspectRatio: '4/5', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.hope}
+              alt="Girls competing in the three-on-three showcase at Rucker Park Africa Lagos 2026"
+            />
           </div>
           <div>
             <Eyebrow>Investing In Girls And Young Women</Eyebrow>
@@ -303,6 +360,13 @@ export default function LagosEdition() {
             Lagos and beyond entered the inaugural competition.
           </P>
         </div>
+
+        <BandImage
+          src={images.ruckerpark.yaba}
+          alt="Academy teams competing across divisions at Rucker Park Africa Lagos 2026"
+          caption="Grassroots academies, elite local players and established figures shared the same court."
+        />
+
         <div className="division-grid reveal">
           {divisions.map(d => (
             <div key={d.name} className="division-card">
@@ -317,7 +381,7 @@ export default function LagosEdition() {
 
       {/* ── 07 ── */}
       <Chapter id="ch-07" num="07" label="Dunk Contest">
-        <div className="chapter-split">
+        <div className="chapter-split media-wide">
           <div>
             <Eyebrow>FruitGuard Dunk Contest</Eyebrow>
             <H>Egbujor Moses</H>
@@ -339,9 +403,10 @@ export default function LagosEdition() {
             </Quote>
           </div>
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.fruitguard), aspectRatio: '4/5', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.fruitguard}
+              alt="Egbujor Moses competing in the FruitGuard Dunk Contest at Rucker Park Africa Lagos 2026"
+            />
           </div>
         </div>
         {videos.moses && (
@@ -353,11 +418,12 @@ export default function LagosEdition() {
 
       {/* ── 08 ── */}
       <Chapter id="ch-08" num="08" label="Three-Point" alt>
-        <div className="chapter-split">
+        <div className="chapter-split media-wide media-left">
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.five), aspectRatio: '4/5', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.five}
+              alt="Oyegunle Yusuf competing in the three-point championship at Rucker Park Africa Lagos 2026"
+            />
           </div>
           <div>
             <Eyebrow>Three-Point Championship</Eyebrow>
@@ -386,21 +452,30 @@ export default function LagosEdition() {
 
       {/* ── 09 ── */}
       <Chapter id="ch-09" num="09" label="Under-18">
-        <div className="chapter-narrow">
-          <Eyebrow>Under-18 Championship</Eyebrow>
-          <H>Anosike Basketball Club</H>
-          <P>
-            Youth development was one of the major reasons Rucker Park Africa was created. The Under-18
-            division gave developing athletes an opportunity to compete in front of a larger audience while
-            experiencing the environment and expectations of an international basketball platform. The
-            division was supported by American Cola Nigeria, which pledged ₦1 million to the championship
-            team.
-          </P>
-          <P delay={3}>
-            Assembled only weeks before the tournament and coached by E.J. Anosike alongside Coach Adekoya,
-            known throughout Lagos as Coach Titi, the team built its chemistry through consistent training
-            and carried it into the championship game.
-          </P>
+        <div className="chapter-split media-wide">
+          <div>
+            <Eyebrow>Under-18 Championship</Eyebrow>
+            <H>Anosike Basketball Club</H>
+            <P>
+              Youth development was one of the major reasons Rucker Park Africa was created. The Under-18
+              division gave developing athletes an opportunity to compete in front of a larger audience while
+              experiencing the environment and expectations of an international basketball platform. The
+              division was supported by American Cola Nigeria, which pledged ₦1 million to the championship
+              team.
+            </P>
+            <P delay={3}>
+              Assembled only weeks before the tournament and coached by E.J. Anosike alongside Coach Adekoya,
+              known throughout Lagos as Coach Titi, the team built its chemistry through consistent training
+              and carried it into the championship game.
+            </P>
+          </div>
+          <div className="reveal chapter-split-media">
+            <Figure
+              src={images.ruckerpark.team}
+              alt="Anosike Basketball Club, inaugural Rucker Park Africa Under-18 champions"
+              caption="Anosike Basketball Club — inaugural Under-18 champions, supported by American Cola Nigeria."
+            />
+          </div>
         </div>
 
         <div className="roster-block reveal">
@@ -427,7 +502,7 @@ export default function LagosEdition() {
 
       {/* ── 10 ── */}
       <Chapter id="ch-10" num="10" label="U-18 MVP" dark>
-        <div className="chapter-split">
+        <div className="chapter-split media-wide">
           <div>
             <Eyebrow>Under-18 Championship MVP</Eyebrow>
             <H light>Damilare Salawu</H>
@@ -446,15 +521,11 @@ export default function LagosEdition() {
             </Quote>
           </div>
           <div className="reveal chapter-split-media">
-            <figure style={{ margin: 0 }}>
-              <div style={{ ...bg(images.ruckerpark.mvp), aspectRatio: '4/3', backgroundColor: '#1a1a1a', position: 'relative' }}>
-                <div className="corner-accent" />
-              </div>
-              <figcaption style={{ fontSize: '0.72rem', color: 'var(--text-faint)', lineHeight: 1.7, marginTop: '1rem', fontStyle: 'italic' }}>
-                U-18 Championship Game MVP Damilare Salawu with Rucker Park Africa President E.J. Anosike
-                and Deputy Vice President of the Anosike Cares Foundation, Mrs. Ngozi Anosike.
-              </figcaption>
-            </figure>
+            <Figure
+              src={images.ruckerpark.mvp}
+              alt="Damilare Salawu receiving the Under-18 MVP award from E.J. Anosike and Mrs. Ngozi Anosike"
+              caption="U-18 Championship Game MVP Damilare Salawu with Rucker Park Africa President E.J. Anosike and Deputy Vice President of the Anosike Cares Foundation, Mrs. Ngozi Anosike."
+            />
           </div>
         </div>
         {videos.damilare && (
@@ -466,11 +537,12 @@ export default function LagosEdition() {
 
       {/* ── 11 ── */}
       <Chapter id="ch-11" num="11" label="Unlimited Division">
-        <div className="chapter-split">
+        <div className="chapter-split media-wide media-left">
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.two), aspectRatio: '4/5', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.two}
+              alt="Raptors Basketball Academy competing in the Unlimited Division final at Rucker Park Africa Lagos 2026"
+            />
           </div>
           <div>
             <Eyebrow>The Unlimited Division</Eyebrow>
@@ -491,20 +563,28 @@ export default function LagosEdition() {
 
       {/* ── 12 ── */}
       <Chapter id="ch-12" num="12" label="Unlimited MVP" alt>
-        <div className="chapter-narrow">
-          <Eyebrow>Unlimited Division MVP</Eyebrow>
-          <H>Jamelo</H>
-          <P>
-            One of the breakout performers of the tournament was Raptors guard Jamelo. His athleticism,
-            defensive intensity and competitiveness helped lead Raptors to an overtime victory over Rowe
-            Park in the championship game. Dunks, steals, blocks and high-energy plays made him one of the
-            event&apos;s most memorable performers.
-          </P>
-          <Quote>
-            I first saw Jamelo earlier that week during a private open gym at National Stadium. His energy
-            and competitiveness immediately stood out. Rucker Park Africa gave him another platform to show
-            people what he can do, and he took advantage of it.
-          </Quote>
+        <div className="chapter-split media-wide">
+          <div>
+            <Eyebrow>Unlimited Division MVP</Eyebrow>
+            <H>Jamelo</H>
+            <P>
+              One of the breakout performers of the tournament was Raptors guard Jamelo. His athleticism,
+              defensive intensity and competitiveness helped lead Raptors to an overtime victory over Rowe
+              Park in the championship game. Dunks, steals, blocks and high-energy plays made him one of the
+              event&apos;s most memorable performers.
+            </P>
+            <Quote>
+              I first saw Jamelo earlier that week during a private open gym at National Stadium. His energy
+              and competitiveness immediately stood out. Rucker Park Africa gave him another platform to show
+              people what he can do, and he took advantage of it.
+            </Quote>
+          </div>
+          <div className="reveal chapter-split-media">
+            <Figure
+              src={images.ruckerpark.talent}
+              alt="Raptors guard Jamelo, Unlimited Division MVP at Rucker Park Africa Lagos 2026"
+            />
+          </div>
         </div>
         {videos.jamelo && (
           <div className="chapter-narrow" style={{ marginTop: '3rem' }}>
@@ -513,11 +593,20 @@ export default function LagosEdition() {
         )}
       </Chapter>
 
-      {/* ── 13 ── */}
+            {/* ── 13 ── */}
       <Chapter id="ch-13" num="13" label="King of Lagos" dark>
         <div className="chapter-narrow">
           <Eyebrow>The Main Event</Eyebrow>
           <H light>King of Lagos</H>
+        </div>
+
+        <BandImage
+          src={images.ruckerpark.king}
+          alt="David Railway Edward competing in the inaugural King of Lagos one-on-one tournament at Rowe Park"
+          caption="David &ldquo;Railway&rdquo; Edward — the inaugural King of Lagos."
+        />
+
+        <div className="chapter-narrow">
           <P light delay={2}>
             The evening ultimately returned to one of the purest traditions of street basketball. One
             player. One opponent. One court. Rucker Park&apos;s identity was built through generations of
@@ -541,34 +630,40 @@ export default function LagosEdition() {
         </div>
       </Chapter>
 
-      <MediaBreak src={images.ruckerpark.king} alt="One-on-one competition during the King of Lagos tournament at Rowe Park" caption="King of Lagos — the inaugural final" />
+      <MediaBreak src={images.ruckerpark.history} alt="Competition action at Rowe Park during the Rucker Park Africa Lagos activation" caption="One court, one day, twelve academies." />
 
       {/* ── 14 ── single image, no carousel ── */}
       <Chapter id="ch-14" num="14" label="Honouring">
-        <div className="chapter-split">
+        <div className="chapter-split media-wide">
           <div>
             <Eyebrow>Honouring Legacy</Eyebrow>
             <H>Dr. Oderah &ldquo;O.D.&rdquo; Anosike</H>
             <P>
-              Rucker Park Africa was created not only to recognise the next generation, but also to honour the people whose careers have helped create pathways for those who follow. The inaugural Rucker Park Africa Legacy Award was presented to Dr. Oderah &ldquo;O.D.&rdquo; Anosike, a retired Nigerian-American professional basketball player.
-
+              Rucker Park Africa was created not only to recognise the next generation, but also to honour
+              the people whose careers have helped create pathways for those who follow. The inaugural
+              Rucker Park Africa Legacy Award was presented to Dr. Oderah &ldquo;O.D.&rdquo; Anosike, a retired
+              Nigerian-American professional basketball player.
             </P>
             <P delay={3}>
-              Dr. Anosike completed a 13-year professional career before retiring in 2026. His career included international championships and a distinguished collegiate career at Siena College, where he led NCAA Division I basketball in rebounding for two consecutive seasons. The Legacy Award recognised his dedication to basketball and the example his career provides for younger athletes.
-
+              Dr. Anosike completed a 13-year professional career before retiring in 2026. His career
+              included international championships and a distinguished collegiate career at Siena College,
+              where he led NCAA Division I basketball in rebounding for two consecutive seasons. The Legacy
+              Award recognised his dedication to basketball and the example his career provides for younger
+              athletes.
             </P>
           </div>
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.legacy2), aspectRatio: '4/3', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.legacy2}
+              alt="Dr. Oderah O.D. Anosike receiving the inaugural Rucker Park Africa Legacy Award"
+            />
           </div>
         </div>
       </Chapter>
 
       {/* ── 15 ── carousel retained ── */}
       <Chapter id="ch-15" num="15" label="Global Community" alt>
-        <div className="chapter-split">
+        <div className="chapter-split media-wide media-left">
           <div className="reveal chapter-split-media">
             <ImageCarousel
               imgs={[images.ruckerpark.collabs, images.ruckerpark.bona]}
@@ -653,7 +748,7 @@ export default function LagosEdition() {
 
       {/* ── 17 ── */}
       <Chapter id="ch-17" num="17" label="Local Business">
-        <div className="chapter-split">
+        <div className="chapter-split media-wide">
           <div>
             <Eyebrow>Creating Value For Local Businesses</Eyebrow>
             <H>The Value Should Stay In The Community</H>
@@ -678,9 +773,10 @@ export default function LagosEdition() {
             </P>
           </div>
           <div className="reveal chapter-split-media">
-            <div style={{ ...bg(images.ruckerpark.prizes), aspectRatio: '4/5', backgroundColor: '#1a1a1a', position: 'relative' }}>
-              <div className="corner-accent" />
-            </div>
+            <Figure
+              src={images.ruckerpark.prizes}
+              alt="Prize presentation supported by partner brands at Rucker Park Africa Lagos 2026"
+            />
           </div>
         </div>
 
@@ -699,7 +795,7 @@ export default function LagosEdition() {
 
       {/* ── 18 ── */}
       <Chapter id="ch-18" num="18" label="Direct Value" dark>
-        <div className="chapter-narrow" style={{ textAlign: 'center' }}>
+        <div className="chapter-narrow" style={{ textAlign: 'center', margin: '0 auto' }}>
           <Eyebrow>₦11 Million In Direct Value</Eyebrow>
           <H light>The Value Did Not Disappear When The Lights Turned Off</H>
           <P light delay={2}>
@@ -713,6 +809,7 @@ export default function LagosEdition() {
             important: something should remain in the community.
           </P>
         </div>
+
         <Stats items={[
           { n: '₦6M+', l: 'Prize Money' },
           { n: '₦5M', l: 'Goods & Support' },
@@ -762,7 +859,7 @@ export default function LagosEdition() {
       {/* ── GALLERY ── */}
       <section className="chapter" style={{ backgroundColor: 'var(--surface)' }}>
         <div className="chapter-inner">
-          <div className="chapter-narrow" style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div className="chapter-narrow" style={{ textAlign: 'center', margin: '0 auto 3rem' }}>
             <Eyebrow>Gallery</Eyebrow>
             <H>Lagos 2026 In Full</H>
           </div>
@@ -772,12 +869,13 @@ export default function LagosEdition() {
 
       {/* ── 20 ── */}
       <Chapter id="ch-20" num="20" label="Summary" dark>
-        <div className="chapter-narrow" style={{ textAlign: 'center' }}>
+        <div className="chapter-narrow" style={{ textAlign: 'center', margin: '0 auto' }}>
           <Eyebrow>Official Impact Summary</Eyebrow>
           <H light>Rucker Park Africa — Lagos 2026</H>
         </div>
+
         <Stats items={impactStats} light />
-        <div className="chapter-narrow" style={{ textAlign: 'center', marginTop: '3rem' }}>
+        <div className="chapter-narrow" style={{ textAlign: 'center', margin: '3rem auto 0' }}>
           <a
             href="/downloads/rucker-park-africa-lagos-2026-impact-summary.pdf"
             className="btn-primary"

@@ -1144,3 +1144,55 @@ a.edition-card:hover { transform: translateY(-4px); border-color: var(--gold); }
 @media (max-width: 768px) {
   .sponsor-image { min-height: 200px; }
 }
+
+/* ── WIDE MEDIA SPLIT ── image column gets more room on desktop ── */
+@media (min-width: 901px) {
+  .chapter-split.media-wide {
+    grid-template-columns: 1fr 1.8fr;
+  }
+  .chapter-split.media-wide.media-left {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+/* ── MOBILE: image before text in every split chapter ── */
+@media (max-width: 900px) {
+  .chapter-split .chapter-split-media {
+    order: -1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   APPEND TO globals.css
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── MOBILE: image before text in every split chapter ── */
+@media (max-width: 900px) {
+  .chapter-split .chapter-split-media {
+    order: -1;
+  }
+}
+
+/* ── WIDE MEDIA SPLIT ── image column gets more room on desktop ── */
+@media (min-width: 901px) {
+  .chapter-split.media-wide {
+    grid-template-columns: 1fr 1.5fr;
+  }
+  /* when the image sits FIRST in the DOM, widen the first column instead */
+  .chapter-split.media-wide.media-left {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+/* ── BAND IMAGE ── centred image for chapters with no side column ── */
+.band-image {
+  margin: 3rem 0;
+  max-width: 900px;
+}
+.band-image figcaption {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  line-height: 1.7;
+  margin-top: 1rem;
+  font-style: italic;
+}

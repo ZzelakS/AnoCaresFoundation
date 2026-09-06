@@ -67,6 +67,7 @@ export const images = {
     legacy: '/images/ruckerpark/legacy.jpg',     // Dr. O.D. Anosike receiving Legacy Award
     bona: '/images/ruckerpark/bona.jpg',       // Adem Bona at the event
     legacy2: '/images/ruckerpark/legacyy.jpg',
+    team: '/images/ruckerpark/team.jpg',
   },
 }
 
