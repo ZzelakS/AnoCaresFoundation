@@ -37,17 +37,18 @@ const P = ({ children, light = false, delay = 2 }: { children: React.ReactNode; 
   </p>
 )
 
+/* Chapter-closing quote. Always sits last, full measure, centred column. */
 const Quote = ({ children, light = false }: { children: React.ReactNode; light?: boolean }) => (
-  <blockquote className="reveal pull-quote">
+  <blockquote className="reveal pull-quote chapter-quote">
     <p
       className="font-display"
       style={{
         fontFamily: 'var(--font-playfair)',
-        fontSize: 'clamp(1.05rem,1.8vw,1.3rem)',
+        fontSize: 'clamp(1.1rem,2vw,1.45rem)',
         fontStyle: 'italic',
         color: light ? '#fff' : 'var(--heading)',
         lineHeight: 1.6,
-        marginBottom: '0.75rem',
+        marginBottom: '0.85rem',
       }}
     >
       {children}
@@ -105,6 +106,77 @@ const BandImage = ({ src, alt, caption }: { src: string; alt: string; caption?: 
   </figure>
 )
 
+/* Video sitting between prose and the closing quote */
+const ChapterVideo = ({ videoId, title, caption }: { videoId: string; title: string; caption?: string }) => (
+  <div className="chapter-narrow reveal" style={{ margin: '3rem auto' }}>
+    <VideoEmbed videoId={videoId} title={title} />
+    {caption && <p className="video-caption">{caption}</p>}
+  </div>
+)
+
+/* ── FULL-BLEED CAROUSEL BAND ──
+   The first image sits in normal flow and sets the height at its natural
+   ratio; the rest layer over it with objectFit: contain. Nothing crops.
+   All sizing is inline so it overrides .media-break's cover rules. */
+const BreakCarousel = ({
+  imgs, caption, slide, onSelect, onPause, onResume,
+}: {
+  imgs: { src: string; alt: string }[]
+  caption?: string
+  slide: number
+  onSelect: (i: number) => void
+  onPause: () => void
+  onResume: () => void
+}) => (
+  <figure
+    className="media-break"
+    style={{ position: 'relative', overflow: 'hidden', backgroundColor: '#0C0C0C' }}
+    onMouseEnter={onPause}
+    onMouseLeave={onResume}
+  >
+    <img
+      src={imgs[0].src}
+      alt={slide === 0 ? imgs[0].alt : ''}
+      aria-hidden={slide !== 0}
+      style={{
+        width: '100%', height: 'auto', display: 'block',
+        minHeight: 0, maxHeight: 'none', objectFit: 'contain',
+        opacity: slide === 0 ? 1 : 0, transition: 'opacity 1s ease',
+      }}
+    />
+    {imgs.slice(1).map((im, i) => (
+      <img
+        key={i + 1}
+        src={im.src}
+        alt={slide === i + 1 ? im.alt : ''}
+        loading="lazy"
+        aria-hidden={slide !== i + 1}
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          minHeight: 0, maxHeight: 'none', objectFit: 'contain',
+          opacity: slide === i + 1 ? 1 : 0, transition: 'opacity 1s ease',
+        }}
+      />
+    ))}
+
+    {imgs.length > 1 && (
+      <div className="honour-dots" style={{ bottom: caption ? '3.25rem' : '1rem' }}>
+        {imgs.map((_, i) => (
+          <button
+            key={i}
+            className={`honour-dot ${slide === i ? 'active' : ''}`}
+            aria-label={`Show image ${i + 1} of ${imgs.length}`}
+            onClick={() => onSelect(i)}
+          />
+        ))}
+      </div>
+    )}
+
+    {caption && <figcaption>{caption}</figcaption>}
+  </figure>
+)
+
 const Chapter = ({
   id, num, label, dark = false, alt = false, children,
 }: {
@@ -126,9 +198,17 @@ const Chapter = ({
 export default function LagosEdition() {
   const ref = useRef<HTMLDivElement>(null)
 
-  /* Carousel state — Chapter 15 only (Chapter 14 is a single image) */
-  const [bonaSlide, setBonaSlide] = useState(0)
+  /* ── CAROUSEL STATE ──
+     One slide index per carousel. All advance together every 5s;
+     hovering any of them pauses the whole set. */
+  const [slides, setSlides] = useState({ crowd: 0, jamelo: 0, od: 0, carter: 0, bona: 0 })
   const [carouselPaused, setCarouselPaused] = useState(false)
+
+  const setSlide = (key: keyof typeof slides, i: number) =>
+    setSlides(s => ({ ...s, [key]: i }))
+
+  const pause = () => setCarouselPaused(true)
+  const resume = () => setCarouselPaused(false)
 
   useEffect(() => {
     const els = ref.current?.querySelectorAll('.reveal')
@@ -143,7 +223,15 @@ export default function LagosEdition() {
 
   useEffect(() => {
     if (carouselPaused) return
-    const id = setInterval(() => setBonaSlide(s => (s + 1) % 2), 5000)
+    const id = setInterval(() => {
+      setSlides(s => ({
+        crowd:  (s.crowd + 1) % 2,
+        jamelo: (s.jamelo + 1) % 2,
+        od:     (s.od + 1) % 2,
+        carter: (s.carter + 1) % 2,
+        bona:   (s.bona + 1) % 2,
+      }))
+    }, 5000)
     return () => clearInterval(id)
   }, [carouselPaused])
 
@@ -173,7 +261,7 @@ export default function LagosEdition() {
         </div>
       </header>
 
-      {/* ── 01 ── */}
+      {/* ── 01 ── prose + image → quote closes ── */}
       <Chapter id="ch-01" num="01" label="Origin">
         <div className="chapter-split media-wide">
           <div>
@@ -196,12 +284,6 @@ export default function LagosEdition() {
               something that directly benefited young people as athletes, students, employees, creators and
               future professionals.
             </P>
-            <Quote>
-              Charity begins at home. Basketball and education have given me the opportunity to travel the
-              world and build relationships across different countries and industries. For me, the
-              responsibility is finding ways to bring some of that access back home and create opportunities
-              for young people who may not have had them before.
-            </Quote>
           </div>
           <div className="reveal chapter-split-media">
             <Figure
@@ -211,9 +293,27 @@ export default function LagosEdition() {
             />
           </div>
         </div>
+
+        <Quote>
+          Charity begins at home. Basketball and education have given me the opportunity to travel the
+          world and build relationships across different countries and industries. For me, the
+          responsibility is finding ways to bring some of that access back home and create opportunities
+          for young people who may not have had them before.
+        </Quote>
       </Chapter>
 
-      <MediaBreak src={images.ruckerpark.crowd} alt="Spectators packed around the court at Rowe Park, Lagos during the Rucker Park Africa activation" caption="Rowe Park at peak attendance" />
+      {/* ── CROWD CAROUSEL ── */}
+      <BreakCarousel
+        imgs={[
+          { src: images.ruckerpark.crowd,  alt: 'Spectators packed around the court at Rowe Park, Lagos during the Rucker Park Africa activation' },
+          { src: images.ruckerpark.crowd2, alt: 'The crowd at Rowe Park during the inaugural Rucker Park Africa activation in Lagos' },
+        ]}
+        caption="Rowe Park at peak attendance"
+        slide={slides.crowd}
+        onSelect={i => setSlide('crowd', i)}
+        onPause={pause}
+        onResume={resume}
+      />
 
       {/* ── 02 ── */}
       <Chapter id="ch-02" num="02" label="Impact" dark>
@@ -227,14 +327,17 @@ export default function LagosEdition() {
         </div>
 
         <Stats items={impactStats} light />
+
         {videos.crowd && (
-          <div className="chapter-narrow" style={{ marginTop: '3rem' }}>
-            <VideoEmbed videoId={videos.crowd} title="Crowd and opening atmosphere — Rucker Park Africa Lagos 2026" />
-          </div>
+          <ChapterVideo
+            videoId={videos.crowd}
+            title="Crowd and opening atmosphere — Rucker Park Africa Lagos 2026"
+            caption="The opening of the inaugural activation at Rowe Park."
+          />
         )}
       </Chapter>
 
-      {/* ── 03 ── */}
+      {/* ── 03 ── prose + image → video → quote closes ── */}
       <Chapter id="ch-03" num="03" label="Employment">
         <div className="chapter-split media-wide">
           <div>
@@ -256,11 +359,6 @@ export default function LagosEdition() {
               professionals, technology professionals and entrepreneurs — the economy around sport extends
               far beyond the players on the court.
             </P>
-            <Quote>
-              Everybody cannot become a professional basketball player, but basketball can still create a
-              profession for thousands of people. We want young people to see the whole economy around
-              sports and entertainment — not just the players on the court.
-            </Quote>
           </div>
           <div className="reveal chapter-split-media">
             <Figure
@@ -269,11 +367,20 @@ export default function LagosEdition() {
             />
           </div>
         </div>
+
         {videos.production && (
-          <div className="chapter-narrow" style={{ marginTop: '3.5rem' }}>
-            <VideoEmbed videoId={videos.production} title="Behind the scenes — production and setup" />
-          </div>
+          <ChapterVideo
+            videoId={videos.production}
+            title="Behind the scenes — production and setup"
+            caption="Young Nigerians at work across production, media and operations."
+          />
         )}
+
+        <Quote>
+          Everybody cannot become a professional basketball player, but basketball can still create a
+          profession for thousands of people. We want young people to see the whole economy around
+          sports and entertainment — not just the players on the court.
+        </Quote>
       </Chapter>
 
       {/* ── 04 ── */}
@@ -340,10 +447,13 @@ export default function LagosEdition() {
             </P>
           </div>
         </div>
+
         {videos.girls && (
-          <div className="chapter-narrow" style={{ marginTop: '3.5rem' }}>
-            <VideoEmbed videoId={videos.girls} title="Girls' showcase and mentorship — Rucker Park Africa Lagos 2026" />
-          </div>
+          <ChapterVideo
+            videoId={videos.girls}
+            title="Girls' showcase and mentorship — Rucker Park Africa Lagos 2026"
+            caption="Sport was the entry point. Education and opportunity were the larger mission."
+          />
         )}
       </Chapter>
 
@@ -379,8 +489,8 @@ export default function LagosEdition() {
         </div>
       </Chapter>
 
-      {/* ── 07 ── */}
-            <Chapter id="ch-07" num="07" label="Dunk Contest">
+      {/* ── 07 ── prose + image → video → quote closes ── */}
+      <Chapter id="ch-07" num="07" label="Dunk Contest">
         <div className="chapter-split media-wide">
           <div>
             <Eyebrow>FruitGuard Dunk Contest</Eyebrow>
@@ -397,10 +507,6 @@ export default function LagosEdition() {
               athletes of the entire activation. His championship celebration became one of the memorable
               cultural moments of the day as Nigerian streamer CarterEfe joined the crowd in celebrating.
             </P>
-            <Quote>
-              Moses is a very talented player and has a bright future ahead of him. I wish him a lot of
-              success as he continues developing.
-            </Quote>
           </div>
           <div className="reveal chapter-split-media">
             <Figure
@@ -409,11 +515,19 @@ export default function LagosEdition() {
             />
           </div>
         </div>
+
         {videos.moses && (
-          <div className="chapter-narrow" style={{ marginTop: '3.5rem' }}>
-            <VideoEmbed videoId={videos.moses} title="Egbujor Moses — championship dunk" />
-          </div>
+          <ChapterVideo
+            videoId={videos.moses}
+            title="Egbujor Moses — championship dunk"
+            caption="The dunk that crowned the first Rucker Park Africa champion."
+          />
         )}
+
+        <Quote>
+          Moses is a very talented player and has a bright future ahead of him. I wish him a lot of
+          success as he continues developing.
+        </Quote>
       </Chapter>
 
       <MediaBreak
@@ -422,7 +536,7 @@ export default function LagosEdition() {
         caption="FruitGuard supplied rehydration products to approximately 100 participating athletes."
       />
 
-      {/* ── 08 ── */}
+      {/* ── 08 ── prose + image → video → quote closes ── */}
       <Chapter id="ch-08" num="08" label="Three-Point" alt>
         <div className="chapter-split media-wide media-left">
           <div className="reveal chapter-split-media">
@@ -443,21 +557,25 @@ export default function LagosEdition() {
               With the championship on the line, Yusuf made six of his final nine three-point attempts to
               capture the title.
             </P>
-            <Quote>
-              Nigeria has a lot of talent. In moments like this, you never know who is going to step up
-              under pressure. That is part of what makes creating these platforms important.
-            </Quote>
           </div>
         </div>
+
         {videos.yusuf && (
-          <div className="chapter-narrow" style={{ marginTop: '3.5rem' }}>
-            <VideoEmbed videoId={videos.yusuf} title="Oyegunle Yusuf — final shooting sequence" />
-          </div>
+          <ChapterVideo
+            videoId={videos.yusuf}
+            title="Oyegunle Yusuf — final shooting sequence"
+            caption="Six of nine from three with the championship on the line."
+          />
         )}
+
+        <Quote>
+          Nigeria has a lot of talent. In moments like this, you never know who is going to step up
+          under pressure. That is part of what makes creating these platforms important.
+        </Quote>
       </Chapter>
 
-      {/* ── 09 ── */}
-      <Chapter id="ch-09" num="09" label="Under-18">
+      {/* ── 09 ── two images → roster → video → quote closes ── */}
+            <Chapter id="ch-09" num="09" label="Under-18">
         <div className="chapter-split media-wide">
           <div>
             <Eyebrow>Under-18 Championship</Eyebrow>
@@ -477,12 +595,18 @@ export default function LagosEdition() {
           </div>
           <div className="reveal chapter-split-media">
             <Figure
-              src={images.ruckerpark.team}
-              alt="Anosike Basketball Club, inaugural Rucker Park Africa Under-18 champions"
-              caption="Anosike Basketball Club — inaugural Under-18 champions, supported by American Cola Nigeria."
+              src={images.ruckerpark.cola}
+              alt="Under-18 division championship supported by American Cola Nigeria at Rucker Park Africa Lagos 2026"
+              caption="The Under-18 division was supported by American Cola Nigeria, which pledged ₦1 million to the championship team."
             />
           </div>
         </div>
+
+        <BandImage
+          src={images.ruckerpark.team}
+          alt="Anosike Basketball Club, inaugural Rucker Park Africa Under-18 champions"
+          caption="Anosike Basketball Club — inaugural Under-18 champions."
+        />
 
         <div className="roster-block reveal">
           <p className="roster-label">Championship Roster</p>
@@ -491,22 +615,29 @@ export default function LagosEdition() {
           </ul>
         </div>
 
-        <div className="chapter-narrow">
-          <Quote>
-            This was a special group of young men. They came together only a few weeks before the
-            tournament and committed themselves to training. Their dedication to each other showed when it
-            mattered most.
-          </Quote>
-        </div>
-
         {videos.u18 && (
-          <div className="chapter-narrow" style={{ marginTop: '3rem' }}>
-            <VideoEmbed videoId={videos.u18} title="Under-18 championship highlights" />
-          </div>
+          <ChapterVideo
+            videoId={videos.u18}
+            title="Under-18 championship highlights"
+            caption="Highlights from the inaugural Under-18 championship game."
+          />
         )}
+        {videos.cola && (
+          <ChapterVideo
+            videoId={videos.cola}
+            title="American Cola Nigeria — Under-18 division partner"
+            caption="American Cola Nigeria backed the Under-18 division."
+          />
+        )}
+
+        <Quote>
+          This was a special group of young men. They came together only a few weeks before the
+          tournament and committed themselves to training. Their dedication to each other showed when it
+          mattered most.
+        </Quote>
       </Chapter>
 
-      {/* ── 10 ── */}
+      {/* ── 10 ── prose + image → video → quote closes ── */}
       <Chapter id="ch-10" num="10" label="U-18 MVP" dark>
         <div className="chapter-split media-wide">
           <div>
@@ -521,10 +652,6 @@ export default function LagosEdition() {
                 the U-18 title.
               </P>
             </div>
-            <Quote light>
-              Damilare loves the game and challenged himself throughout our training. His performance showed
-              not only the player he is today, but the player he has the potential to become.
-            </Quote>
           </div>
           <div className="reveal chapter-split-media">
             <Figure
@@ -534,11 +661,19 @@ export default function LagosEdition() {
             />
           </div>
         </div>
+
         {videos.damilare && (
-          <div className="chapter-narrow" style={{ marginTop: '3.5rem' }}>
-            <VideoEmbed videoId={videos.damilare} title="Damilare Salawu — deep three-pointer" />
-          </div>
+          <ChapterVideo
+            videoId={videos.damilare}
+            title="Damilare Salawu — deep three-pointer"
+            caption="The late-clock three from near half court that sealed the fourth quarter."
+          />
         )}
+
+        <Quote light>
+          Damilare loves the game and challenged himself throughout our training. His performance showed
+          not only the player he is today, but the player he has the potential to become.
+        </Quote>
       </Chapter>
 
       {/* ── 11 ── */}
@@ -567,7 +702,7 @@ export default function LagosEdition() {
         </div>
       </Chapter>
 
-      {/* ── 12 ── */}
+      {/* ── 12 ── carousel + prose → video → quote closes ── */}
       <Chapter id="ch-12" num="12" label="Unlimited MVP" alt>
         <div className="chapter-split media-wide">
           <div>
@@ -579,27 +714,35 @@ export default function LagosEdition() {
               Park in the championship game. Dunks, steals, blocks and high-energy plays made him one of the
               event&apos;s most memorable performers.
             </P>
-            <Quote>
-              I first saw Jamelo earlier that week during a private open gym at National Stadium. His energy
-              and competitiveness immediately stood out. Rucker Park Africa gave him another platform to show
-              people what he can do, and he took advantage of it.
-            </Quote>
           </div>
           <div className="reveal chapter-split-media">
-            <Figure
-              src={images.ruckerpark.talent}
+            <ImageCarousel
+              imgs={[images.ruckerpark.jamelo, images.ruckerpark.talent]}
               alt="Raptors guard Jamelo, Unlimited Division MVP at Rucker Park Africa Lagos 2026"
+              slide={slides.jamelo}
+              onSelect={i => setSlide('jamelo', i)}
+              onPause={pause}
+              onResume={resume}
             />
           </div>
         </div>
+
         {videos.jamelo && (
-          <div className="chapter-narrow" style={{ marginTop: '3rem' }}>
-            <VideoEmbed videoId={videos.jamelo} title="Jamelo — Unlimited Division highlights" />
-          </div>
+          <ChapterVideo
+            videoId={videos.jamelo}
+            title="Jamelo — Unlimited Division highlights"
+            caption="Dunks, steals and blocks from the Unlimited Division MVP."
+          />
         )}
+
+        <Quote>
+          I first saw Jamelo earlier that week during a private open gym at National Stadium. His energy
+          and competitiveness immediately stood out. Rucker Park Africa gave him another platform to show
+          people what he can do, and he took advantage of it.
+        </Quote>
       </Chapter>
 
-            {/* ── 13 ── */}
+      {/* ── 13 ── */}
       <Chapter id="ch-13" num="13" label="King of Lagos" dark>
         <div className="chapter-narrow">
           <Eyebrow>The Main Event</Eyebrow>
@@ -630,15 +773,18 @@ export default function LagosEdition() {
             The first King of Lagos was crowned on the same court where he had built his reputation.
           </P>
         </div>
-        <div className="video-pair chapter-narrow">
-          {videos.kingMontage && <VideoEmbed videoId={videos.kingMontage} title="King of Lagos — one-on-one montage" />}
-          {videos.railway && <VideoEmbed videoId={videos.railway} title="Railway — final possession and celebration" />}
-        </div>
+
+        {(videos.kingMontage || videos.railway) && (
+          <div className="video-pair chapter-narrow">
+            {videos.kingMontage && <VideoEmbed videoId={videos.kingMontage} title="King of Lagos — one-on-one montage" />}
+            {videos.railway && <VideoEmbed videoId={videos.railway} title="Railway — final possession and celebration" />}
+          </div>
+        )}
       </Chapter>
 
       <MediaBreak src={images.ruckerpark.history} alt="Competition action at Rowe Park during the Rucker Park Africa Lagos activation" caption="One court, one day, twelve academies." />
 
-      {/* ── 14 ── single image, no carousel ── */}
+      {/* ── 14 ── */}
       <Chapter id="ch-14" num="14" label="Honouring">
         <div className="chapter-split media-wide">
           <div>
@@ -659,25 +805,29 @@ export default function LagosEdition() {
             </P>
           </div>
           <div className="reveal chapter-split-media">
-            <Figure
-              src={images.ruckerpark.legacy2}
+            <ImageCarousel
+              imgs={[images.ruckerpark.legacy, images.ruckerpark.legacy2]}
               alt="Dr. Oderah O.D. Anosike receiving the inaugural Rucker Park Africa Legacy Award"
+              slide={slides.od}
+              onSelect={i => setSlide('od', i)}
+              onPause={pause}
+              onResume={resume}
             />
           </div>
         </div>
       </Chapter>
 
-      {/* ── 15 ── carousel retained ── */}
+      {/* ── 15 ── */}
       <Chapter id="ch-15" num="15" label="Global Community" alt>
         <div className="chapter-split media-wide media-left">
           <div className="reveal chapter-split-media">
             <ImageCarousel
               imgs={[images.ruckerpark.collabs, images.ruckerpark.bona]}
               alt="Philadelphia 76ers player Adem Bona at Rucker Park Africa Lagos 2026"
-              slide={bonaSlide}
-              onSelect={setBonaSlide}
-              onPause={() => setCarouselPaused(true)}
-              onResume={() => setCarouselPaused(false)}
+              slide={slides.bona}
+              onSelect={i => setSlide('bona', i)}
+              onPause={pause}
+              onResume={resume}
             />
           </div>
           <div>
@@ -697,7 +847,7 @@ export default function LagosEdition() {
         </div>
       </Chapter>
 
-      {/* ── 16 ── culture, with embedded performance video + footnotes ── */}
+      {/* ── 16 ── prose → video → prose → carousel → video → notes ── */}
       <Chapter id="ch-16" num="16" label="Culture" dark>
         <div className="chapter-narrow">
           <Eyebrow>When Basketball Meets Culture</Eyebrow>
@@ -715,12 +865,11 @@ export default function LagosEdition() {
         </div>
 
         {videos.jumabee && (
-          <div className="chapter-narrow" style={{ margin: '2.5rem 0 3rem' }}>
-            <VideoEmbed videoId={videos.jumabee} title="Jumabee live performance — Rucker Park Africa Lagos 2026" />
-            <p className="video-caption">
-              Jumabee performing at Rowe Park, Lagos — 30 July 2026.
-            </p>
-          </div>
+          <ChapterVideo
+            videoId={videos.jumabee}
+            title="Jumabee live performance — Rucker Park Africa Lagos 2026"
+            caption="Jumabee performing at Rowe Park, Lagos — 30 July 2026."
+          />
         )}
 
         <div className="chapter-narrow">
@@ -730,6 +879,30 @@ export default function LagosEdition() {
             also in attendance. Their participation helped create an atmosphere that reflected modern youth
             culture rather than a traditional sporting event.
           </P>
+        </div>
+
+        <div className="band-image reveal">
+          <ImageCarousel
+            imgs={[images.ruckerpark.carter1, images.ruckerpark.carter2]}
+            alt="Nigerian streamer and creator CarterEfe at Rucker Park Africa Lagos 2026"
+            slide={slides.carter}
+            onSelect={i => setSlide('carter', i)}
+            onPause={pause}
+            onResume={resume}
+            ratio="16/9"
+          />
+          <figcaption>CarterEfe at Rowe Park — his reaction to the dunk contest final travelled widely.</figcaption>
+        </div>
+
+        {videos.carterefe && (
+          <ChapterVideo
+            videoId={videos.carterefe}
+            title="CarterEfe walkthrough — Rucker Park Africa Lagos 2026"
+            caption="CarterEfe walking the court at Rowe Park, Lagos — 30 July 2026."
+          />
+        )}
+
+        <div className="chapter-narrow">
           <p className="reveal reveal-delay-3" style={{ color: 'var(--gold)', fontStyle: 'italic', fontSize: '1.1rem', marginTop: '2rem' }}>
             Music, creators, fashion, entertainment and digital culture expanded the experience.
           </p>
@@ -823,7 +996,7 @@ export default function LagosEdition() {
         ]} light />
       </Chapter>
 
-      {/* ── 19 ── */}
+      {/* ── 19 ── prose → statement → quote closes ── */}
       <Chapter id="ch-19" num="19" label="Beyond">
         <div className="chapter-narrow">
           <Eyebrow>More Than An Event</Eyebrow>
@@ -849,15 +1022,15 @@ export default function LagosEdition() {
             </p>
           </div>
 
-          <Quote>
-            Basketball gave me a platform. Education gave me the tools to navigate the world. The goal now
-            is to use those experiences and relationships to help create access for other young people.
-          </Quote>
-
           <p className="reveal" style={{ color: 'var(--gold)', fontStyle: 'italic', fontSize: '1.15rem', textAlign: 'center', marginTop: '2.5rem' }}>
             The work continues.
           </p>
         </div>
+
+        <Quote>
+          Basketball gave me a platform. Education gave me the tools to navigate the world. The goal now
+          is to use those experiences and relationships to help create access for other young people.
+        </Quote>
       </Chapter>
 
       <MediaBreak src={images.ruckerpark.beacon} alt="E.J. Anosike on court with young participants and the crowd behind him at Rowe Park, Lagos" caption="Lagos was the first chapter." />

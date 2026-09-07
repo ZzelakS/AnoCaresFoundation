@@ -67,10 +67,12 @@ export const videos = {
   yusuf:      '',            // 08 — Yusuf final shooting sequence
   u18:        '',            // 09 — U-18 championship highlights
   damilare:   '',            // 10 — Damilare deep three
-  jamelo:     '',            // 12 — Jamelo highlights
+  jamelo:     '1224395178',            // 12 — Jamelo dunk highlights
   kingMontage:'',            // 13 — King of Lagos 1v1 montage
   railway:    '',            // 13 — Railway final possession
-  jumabee:    '1223346784',            // 16 — Jumabee performance
+  jumabee:    '1223346784',  // 16 — Jumabee performance
+  carterefe:  '1224390829',            // 16 — CarterEfe walkthrough
+  cola:       '1224394076',            // 09 — American Cola Nigeria
 }
 
 /* ── GALLERY ──

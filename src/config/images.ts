@@ -64,12 +64,16 @@ export const images = {
     king: '/images/ruckerpark/king.jpg',
     sponsors: '/images/ruckerpark/sponsor.jpeg',   // sponsor banner / brand activation wall
     mvp: '/images/ruckerpark/dami.jpeg',        // Damilare with E.J. and Mrs. Ngozi Anosike
-    legacy: '/images/ruckerpark/legacy.jpg',     // Dr. O.D. Anosike receiving Legacy Award
     bona: '/images/ruckerpark/bona.jpg',       // Adem Bona at the event
+    legacy: '/images/ruckerpark/legacy2.jpeg',     // Dr. O.D. Anosike receiving Legacy Award
     legacy2: '/images/ruckerpark/legacyy.jpg',
     team: '/images/ruckerpark/team.jpg',
     juice: '/images/ruckerpark/juice.jpg',
     education: '/images/ruckerpark/education.jpg',
+    carter1: '/images/ruckerpark/carter1.jpeg',
+    carter2: '/images/ruckerpark/carter2.jpeg',
+    jamelo: '/images/ruckerpark/jamelo.jpeg',
+    crowd2: '/images/ruckerpark/crowd.jpeg',
   },
 }
 
